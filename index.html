@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"/>
+		<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'"/>
+		<title>Archiver</title>
+		<link rel="stylesheet" href="./style.css"></style>
+	</head>
+	<body>
+		<div class="search-bar">
+			<input type="text" id="search">
+		</div>
+
+		<div class="flex">
+			<!-- <div id="non-tagged-videos-alert"> etiketlenmemiş videolar var </div> -->
+			<button id="non-tagged-videos-button">Etiketlenmemiş videoları gör</button>
+		</div>
+
+		<div id="files"></div>
+
+		<script src="./renderer.js"></script>
+	</body>
+</html>

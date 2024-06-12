@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Archiver - video detail page
+		</title>
+		<style>
+			table, th, td, tr{border: 1px solid black;border-collapse: collapse}
+		</style>
+	</head>
+	<body>
+		<h1 class="title"></h1>
+		<video id="video" controls></video>
+		<pre><code class="data"></code></pre>
+		<div class="button">
+			<button id="open-in-folder-button">Dosya Konumuna Git</button>
+			<!-- <button>Videoyu Sil</button> -->
+			<hr>
+			<table id="tags-table">
+			
+			</table>
+			<input id="add-tag-input" type="text">
+			<button id="add-tag-button">Etiket Ekle</button>
+		</div>
+		<script>
+			var video = undefined;
+			window.electronAPI.path((path) => {
+				document.querySelector(".title").innerHTML = path;
+				try {
+					document.getElementById("video").src = "videos/" + path;
+				} catch (error) {
+					console.log("hata");
+				}
+				document.getElementById("video").style.width = "50%";
+				video = path;
+				console.log(path);
+				
+				document.getElementById("open-in-folder-button").onclick = () => {
+					window.electronAPI.openInFolder(video);
+				};
+				
+				window.electronAPI.db((data) => {
+					document.getElementById("add-tag-button").onclick = () => {
+						window.electronAPI.addTag({
+							tags: document.getElementById("add-tag-input").value.toString().trim().split(" "),
+							path: path
+						});
+						var tag = document.getElementById("add-tag-input").value.toString();
+						for(var i = 0;i<data.length;i++){
+							if(data[i].name == path){
+								data[i].tags.push(tag);
+								console.log(data);
+							}
+						}
+					};
+					for(var i = 0;i<data.length;i++){
+						if(data[i].name == path){
+							db = data[i];
+							document.querySelector(".data").innerHTML = JSON.stringify(db, undefined, 2);
+							listTagsOnTable(db.tags);
+							return;
+						}
+					}
+					document.querySelector(".data").innerHTML = "- NULL -";
+				});
+			});
+			
+			
+			function listTagsOnTable(tags){
+				var table = document.getElementById("tags-table");
+				for(var i = 0;i<tags.length;i++){
+					var tr = document.createElement("tr");
+					var td1 = document.createElement("td");
+					td1.innerHTML = tags[i];
+					tr.appendChild(td1);
+					var td2 = document.createElement("td");
+					td2.innerHTML = '<button class="delete-button" data-tag="'+ tags[i] +'" data-video="'+ video +'">sil</button>';
+					tr.appendChild(td2);
+					table.appendChild(tr);
+				}
+				var deleteButtons = document.querySelectorAll(".delete-button");
+				deleteButtons.forEach((elem) => {
+					elem.onclick = () => {
+						console.log(elem.dataset);
+						if(elem.dataset.video != "undefined"){
+							window.electronAPI.deleteTag(elem.dataset.tag, elem.dataset.video);
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+</html>
